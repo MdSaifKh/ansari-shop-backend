@@ -1,5 +1,6 @@
 package com.ansarishop.app.controller;
 
+import com.ansarishop.app.entity.AuthResponse;
 import com.ansarishop.app.entity.LoginRequest;
 import com.ansarishop.app.service.impl.UserServiceImpl;
 import com.ansarishop.app.utils.JWTUtils;
@@ -33,23 +34,21 @@ public class AuthController {
     private JWTUtils jwtUtils;
 
     @PostMapping("/authenticate")
-    public String login(@RequestBody LoginRequest request, HttpServletRequest httpRequest) {
+    public AuthResponse login(@RequestBody LoginRequest request, HttpServletRequest httpRequest) {
         logger.info(" === inside authenticate method === ");
+        AuthResponse response = new AuthResponse();
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getUserName(), request.getPassword())
             );
-            //SecurityContextHolder.getContext().setAuthentication(authentication);
+            response.setToken(jwtUtils.generateToken(request.getUserName()));
 
-            logger.info(" === after authentication === ");
-            return jwtUtils.generateToken(request.getUserName());
-            //return ResponseEntity.ok(userService.findByUserName(request.getUserName()));
         } catch (AuthenticationException e) {
             //return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
             logger.error(e.getMessage());
-            return e.getMessage();
+            response.setError(e.getMessage());
         }
-
+        return response;
     }
 }
 
