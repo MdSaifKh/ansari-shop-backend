@@ -1,9 +1,12 @@
 package com.ansarishop.app.utils;
 
+import com.ansarishop.app.service.impl.CustomUserDetailsService;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +18,8 @@ public class JWTUtils {
     private final long EXPIRATION_TIME = 1000 * 60 * 60;
     private final String SECRET = "This-is-my-saif@12345-secret-key!&&7890";
     private SecretKey key = Keys.hmacShaKeyFor(SECRET.getBytes());
+    @Autowired
+    private CustomUserDetailsService customUserDetailsService;
     public String generateToken(String username){
         // 1 hour
 
@@ -45,5 +50,15 @@ public class JWTUtils {
 
     private boolean isTokenExpired(String token) {
         return extractClaims(token).getExpiration().before(new Date());
+    }
+
+    public boolean validateToken(String token) {
+        try {
+            String username = extractUserName(token);
+            UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
+            return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+        }catch (ExpiredJwtException e){
+            return false;
+        }
     }
 }
