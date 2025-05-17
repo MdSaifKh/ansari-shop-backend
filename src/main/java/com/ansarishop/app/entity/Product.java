@@ -13,13 +13,14 @@ public class Product {
     private String name;
     private String description;
     private long stock;
-    private long cost;
-    private long sellingPrice;
+    private String cost;
+    private String sellingPrice;
 
     public Product(){
 
     }
-    public Product(long id, String name, String description, long stock, long cost, long sellingPrice) {
+
+    public Product(long id, String name, String description, long stock, String cost, String sellingPrice) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -60,19 +61,19 @@ public class Product {
         this.stock = stock;
     }
 
-    public long getCost() {
+    public String getCost() {
         return cost;
     }
 
-    public void setCost(long cost) {
+    public void setCost(String cost) {
         this.cost = cost;
     }
 
-    public long getSellingPrice() {
+    public String getSellingPrice() {
         return sellingPrice;
     }
 
-    public void setSellingPrice(long sellingPrice) {
+    public void setSellingPrice(String sellingPrice) {
         this.sellingPrice = sellingPrice;
     }
 
@@ -83,8 +84,8 @@ public class Product {
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", stock=" + stock +
-                ", cost=" + cost +
-                ", sellingPrice=" + sellingPrice +
+                ", cost='" + cost + '\'' +
+                ", sellingPrice='" + sellingPrice + '\'' +
                 '}';
     }
 }

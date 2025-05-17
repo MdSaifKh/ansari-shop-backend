@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/product")
@@ -15,8 +16,9 @@ public class ProductController {
     private ProductService productService;
 
     @PostMapping("/save")
-    public ResponseEntity<Product> saveProduct(@RequestBody Product product){
-        return ResponseEntity.ok(productService.saveProduct(product));
+    public ResponseEntity<?> saveProduct(@RequestBody Product product){
+        Product savedProduct = productService.saveProduct(product);
+        return ResponseEntity.ok(Objects.requireNonNullElse(savedProduct, "Product already exists with this name"));
     }
 
     @GetMapping("/all")
