@@ -1,7 +1,9 @@
 package com.ansarishop.app.controller;
 
+import com.ansarishop.app.dto.request.UpdateProductStockRequest;
 import com.ansarishop.app.entity.Product;
 import com.ansarishop.app.service.ProductService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +13,7 @@ import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/product")
+@Slf4j
 public class ProductController {
     @Autowired
     private ProductService productService;
@@ -44,5 +47,13 @@ public class ProductController {
     @DeleteMapping("/delete")
     public ResponseEntity<String> deleteById(@RequestParam long id){
         return ResponseEntity.ok(productService.deleteById(id));
+    }
+
+    @PostMapping("/update-stock")
+    public ResponseEntity<String> updateStock(@RequestBody List<Product> products){
+        productService.updateStock(products);
+        log.info("checking 0 stock products");
+        productService.deleteAllWithStockZero();
+        return ResponseEntity.ok("Successfully updated stocks");
     }
 }

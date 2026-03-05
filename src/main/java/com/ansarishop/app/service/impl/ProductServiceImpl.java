@@ -1,20 +1,23 @@
 package com.ansarishop.app.service.impl;
 
 import com.ansarishop.app.controller.AuthController;
+import com.ansarishop.app.dto.request.UpdateProductStockRequest;
 import com.ansarishop.app.entity.Product;
 import com.ansarishop.app.exceptions.ProductNotFoundException;
 import com.ansarishop.app.repository.ProductRepository;
 import com.ansarishop.app.service.ProductService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.transaction.annotation.Transactional;
+
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -43,6 +46,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public String deleteByName(String name) {
         String response = "";
         Product product = productRepository.findByName(name);
@@ -56,6 +60,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public Product update(Product product) {
         product.setName(product.getName().trim());
         logger.info("product name in update product method"+product.getName());
@@ -72,10 +77,31 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public String deleteById(long id) {
         productRepository.findById(id).orElseThrow(
                 ()-> new ProductNotFoundException("Sorry, Product not found with this ID"));
         productRepository.deleteById(id);
         return "Deleted Successfully !!";
+    }
+
+    @Override
+    @Transactional
+    public void updateStock(List<Product> products) {
+        this.productRepository.saveAll(products);
+    }
+
+    @Transactional
+    @Override
+    public void deleteAllWithStockZero() {
+        logger.info("checking if product present with stock 0");
+        List<Product> productWithStockZero = this.productRepository.findByStock(0);
+
+        if(!productWithStockZero.isEmpty()){
+            logger.info("Deleting stock with stock 0");
+            this.productRepository.deleteAll(productWithStockZero);
+        }else{
+            logger.info("No records with 0 stock found");
+        }
     }
 }

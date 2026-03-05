@@ -4,6 +4,7 @@ import com.ansarishop.app.filter.JWTAuthFilter;
 import com.ansarishop.app.service.impl.CustomUserDetailsService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -33,6 +34,9 @@ public class SecurityConfig {
     @Autowired
     private JWTAuthFilter jwtAuthFilter;
 
+    @Value("${ui.url}")
+    private String uiUrl;
+
     public SecurityConfig(CustomUserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
@@ -43,7 +47,8 @@ public class SecurityConfig {
         http.cors(cors-> cors.configurationSource(corsConfigurationSource())).
                 csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/auth/**"
+                        ,"/api/common/home").permitAll()
                         .anyRequest().authenticated()
                 ).httpBasic(Customizer.withDefaults());
         http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
@@ -53,7 +58,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:3000")); // Your React app URL
+        config.setAllowedOrigins(List.of(uiUrl, "http://localhost:3000/")); // Your React app URL
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true); // Very important for session-based auth

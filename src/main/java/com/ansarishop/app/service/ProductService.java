@@ -1,5 +1,6 @@
 package com.ansarishop.app.service;
 
+import com.ansarishop.app.dto.request.UpdateProductStockRequest;
 import com.ansarishop.app.entity.Product;
 import com.ansarishop.app.exceptions.ProductNotFoundException;
 
@@ -14,4 +15,8 @@ public interface ProductService {
     Product update(Product product);
     Product findByName(String name) throws ProductNotFoundException;
     String deleteById(long id);
+
+    void updateStock(List<Product> products);
+
+    void deleteAllWithStockZero();
 }
